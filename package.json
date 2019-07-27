@@ -1,0 +1,34 @@
+{
+  "name": "pmr-server",
+  "version": "0.0.1",
+  "description": "REST API server for Poor Man's Rekognition project under CCExtractor Development",
+  "main": "./src/index.ts",
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "ccextractor",
+    "face-recognition",
+    "video-analytics",
+    "poor-mans-rekognition",
+    "amazon-rekognition"
+  ],
+  "author": {
+    "name": "Sarfaraz Iraqui",
+    "email": "sarfarazghlm@gmail.com"
+  },
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sziraqui/pmr-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sziraqui/pmr-server/issues"
+  },
+  "homepage": "https://github.com/sziraqui/pmr-server#readme",
+  "devDependencies": {
+    "ts-node": "^8.3.0",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "^3.5.3"
+  }
+}
