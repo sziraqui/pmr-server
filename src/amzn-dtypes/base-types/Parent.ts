@@ -1,8 +1,7 @@
 export class Parent {
     /**
      * Parent label
-     * @param Name 
-     * @param Confidence 
+     * @param Name
      */
-    constructor(public Name: string = '', public Confidence: number = 0) { }
+    constructor(public Name: string = 'label_name') { }
 }

@@ -1,4 +1,4 @@
-export class SunglassesOpen {
+export class Sunglasses {
     /**
      * 
      * @param Value true if sunglasses present
