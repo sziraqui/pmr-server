@@ -1,3 +1,6 @@
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_Landmark.html
+ */
 export type LandmarkType = 'eyeLeft' | 'eyeRight' | 'nose' | 'mouthLeft' | 'mouthRight' | 'leftEyeBrowLeft' | 'leftEyeBrowRight' | 'leftEyeBrowUp' | 'rightEyeBrowLeft' | 'rightEyeBrowRight' | 'rightEyeBrowUp' | 'leftEyeLeft' | 'leftEyeRight' | 'leftEyeUp' | 'leftEyeDown' | 'rightEyeLeft' | 'rightEyeRight' | 'rightEyeUp' | 'rightEyeDown' | 'noseLeft' | 'noseRight' | 'mouthUp' | 'mouthDown' | 'leftPupil' | 'rightPupil' | 'upperJawlineLeft' | 'midJawlineLeft' | 'chinBottom' | 'midJawlineRight' | 'upperJawlineRight' | '';
 export class Landmark {
     /**

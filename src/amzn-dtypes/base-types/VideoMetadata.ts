@@ -1,4 +1,6 @@
-import * as amzn from '../';
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_VideoMetadata.html
+ */
 export type VideoFormat = 'MOV' | 'MP4' | 'AVI';
 export class VideoMetadata {
     /**

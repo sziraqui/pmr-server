@@ -1,3 +1,6 @@
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_Gender.html
+ */
 export type GenderValue = 'Male' | 'Female';
 export class Gender {
     /**

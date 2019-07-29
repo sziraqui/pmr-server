@@ -1,3 +1,6 @@
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_BoundingBox.html
+ */
 export type Rectangle = { x: number, y: number, width: number, height: number }
 export class BoundingBox {
     /**

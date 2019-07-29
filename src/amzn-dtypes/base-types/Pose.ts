@@ -1,3 +1,6 @@
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_Pose.html
+ */
 export class Pose {
     /**
      * Pose described by angle of pitch, roll and yaw axes.

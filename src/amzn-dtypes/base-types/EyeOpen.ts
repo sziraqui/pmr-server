@@ -1,3 +1,6 @@
+/**
+ * @see https://docs.aws.amazon.com/rekognition/latest/dg/API_EyeOpen.html
+ */
 export class EyeOpen {
     /**
      * 
