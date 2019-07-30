@@ -6,17 +6,19 @@
         "module": "commonjs",
         "target": "es6",
         "sourceMap": true,
-        "outDir": "lib",
+        "outDir": "dist",
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
         "noLib": false,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "lib": [
             "esnext"
         ]
     },
     "exclude": [
         "node_modules",
-        "lib"
+        "dist"
     ],
     "include": [
         "src"
