@@ -4,11 +4,11 @@ import * as settings from '../../config/dbconfig.json';
 import { Pool } from 'pg';
 
 export class DbConnection {
-    private static instance;
+    private static instance: DbConnection;
     private constructor(private pool: Pool) { }
 
     public static getInstance() {
-        const ENV = secrets.environment || 'local';
+        const ENV = secrets.environment || 'dev';
         if (!DbConnection.instance) {
             console.log('Creating database pool');
             let pool = new Pool({
@@ -32,23 +32,23 @@ export class DbConnection {
      * @param query 
      * @param params 
      */
-    executeQuery(query: string, params: any[] = []) {
-        return this.pool.connect()
-            .then(dbClient => {
-                return dbClient.query(query, params)
-                    .then(data => {
-                        dbClient.release();
-                        return data.rows;
-                    })
-                    .catch(err => {
-                        dbClient.release();
-                        console.log(err);
-                        return Promise.reject(err);
-                    });
-            })
-            .catch(err => {
+    async executeQuery(query: string, params: any[] = []) {
+        try {
+            const dbClient = await this.pool.connect();
+            try {
+                const data = await dbClient.query(query, params);
+                dbClient.release();
+                return data.rows;
+            }
+            catch (err) {
+                dbClient.release();
                 console.log(err);
                 return Promise.reject(err);
-            });
+            }
+        }
+        catch (err_1) {
+            console.log(err_1);
+            return Promise.reject(err_1);
+        }
     }
 }

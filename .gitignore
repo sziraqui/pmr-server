@@ -3,3 +3,6 @@
 .vscode
 # transpiled files
 lib
+# config files
+config/*.json
+
