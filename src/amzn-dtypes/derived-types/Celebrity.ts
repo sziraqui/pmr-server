@@ -1,4 +1,4 @@
-import * as uuid from 'uuidv4';
+import uuid from 'uuidv4';
 import * as amzn from '../';
 
 /**
