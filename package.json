@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "REST API server for Poor Man's Rekognition project under CCExtractor Development",
   "main": "./src/index.ts",
+  "types": "./index.d.ts",
   "engines": {
     "node": ">=8"
   },
@@ -32,9 +33,13 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "@tensorflow/tfjs-node": "^1.2.7",
+    "@types/argparse": "^1.0.36",
     "@types/pg": "^7.4.14",
     "@types/uuidv4": "^2.0.0",
+    "argparse": "^1.0.10",
     "pg": "^7.12.1",
+    "pmr-core": "0.0.1",
     "uuidv4": "^4.0.0"
   }
 }
