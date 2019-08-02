@@ -15,11 +15,19 @@ export class DbHelper {
      */
     async insertFace(embedding: number[], name: string) {
         let faceId = uuidv4();
-        let personId = await this.getPersonId(name).catch(err => console.log(err));;
-        await this.db.executeQuery(qri.INSERT_FACE_DATA, [faceId, embedding, personId, name]).catch(err => console.log(err));
+        let personId = await this.getPersonId(name).catch(err => console.log(err));
+        try {
+            return await this.db.executeQuery(qri.INSERT_FACE_DATA, [faceId, embedding, personId, name]);
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
     async getFaceByName(name: string, count: number) {
-        return await this.db.executeQuery(qri.SELECT_FACES_BY_NAME, [name, count]).catch(err => console.log(err));
+        try {
+            return await this.db.executeQuery(qri.SELECT_FACES_BY_NAME, [name, count]);
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
     /**
      * Retrives personId if name exists in face database
