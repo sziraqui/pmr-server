@@ -9,9 +9,12 @@ import { DbHelper } from '../src/dbclient';
 
 let parser = new ArgumentParser();
 parser.addArgument('dataPath', { help: 'dataset directory' });
+parser.addArgument('dataset', { help: 'name of dataset eg. lfw' });
+parser.addArgument('variant', { help: 'dataset variant eg. "deepfunneled" for lfw-deepfunneled', defaultValue: 'main', required: false });
+let args = parser.parseArgs();
+
 let faceModelParams = new FaceModelParameters([__dirname]);
 let mtcnn: FaceDetector, facenet: Facenet, dbh: DbHelper;
-let args = parser.parseArgs();
 
 async function run(dataPath: string) {
     mtcnn = await FaceDetector.getInstance({ detector: 'mtcnn', weightsPath: faceModelParams.getMtcnnLocation() });
@@ -37,11 +40,12 @@ async function handleFaceDir(dir: string) {
             faceBlobs.forEach(async (faceBlob) => {
                 faceBlob.descriptor = await facenet.embedding(faceBlob.faceImage);
                 let personName = path.basename(dir).replace('_', ' ');
-                await dbh.insertFace(Array.from(faceBlob.descriptor), personName);
+                let res = await dbh.insertFace(Array.from(faceBlob.descriptor), personName);
+                res['update_dataset_status'] = await dbh.updateDatasetInfo(args.dataset.toUpperCase(), args.variant.toUpperCase(), path.join(path.basename(dir), file), res['face_id']);
+                return res;
             });
         });
     });
 }
 
-console.log(args);
 run(path.resolve(args.dataPath));

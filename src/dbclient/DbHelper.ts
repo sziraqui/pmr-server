@@ -1,6 +1,6 @@
 import { DbConnection } from './DbConnection';
 import * as qri from './Queries';
-import uuidv4 = require('uuidv4');
+import uuidv4 from 'uuidv4';
 
 export class DbHelper {
     private db: DbConnection;
@@ -13,20 +13,22 @@ export class DbHelper {
      * @param embedding 128 length face embedding
      * @param name Name for this person
      */
-    async insertFace(embedding: number[], name: string) {
+    async insertFace(embedding: number[], name: string, datasetName: string = 'custom', datasetVarient: string = 'manual') {
         let faceId = uuidv4();
         let personId = await this.getPersonId(name).catch(err => console.log(err));
         try {
-            return await this.db.executeQuery(qri.INSERT_FACE_DATA, [faceId, embedding, personId, name]);
+            let res1 = await this.db.executeQuery(qri.INSERT_FACE_DATA, [faceId, embedding, personId, name]);
+            res1['face_id'] = faceId;
+            return res1;
         } catch (err) {
-            return Promise.reject(err);
+            return Promise.reject(err.message);
         }
     }
     async getFaceByName(name: string, count: number) {
         try {
             return await this.db.executeQuery(qri.SELECT_FACES_BY_NAME, [name, count]);
         } catch (err) {
-            return Promise.reject(err);
+            return Promise.reject(err.message);
         }
     }
     /**
@@ -39,5 +41,13 @@ export class DbHelper {
         if (result && result.length > 0 && uuidv4.is(result[0].personid)) {
             return result[0].personid;
         } else return uuidv4();
+    }
+
+    async updateDatasetInfo(datasetName: string, datasetVarient: string, fileName: string, faceId: string) {
+        try {
+            return await this.db.executeQuery(qri.INSERT_INTO_DATASET_FACE_ID, [datasetName, datasetVarient, fileName, faceId])
+        } catch (err) {
+            return Promise.reject(err.message);
+        }
     }
 }
