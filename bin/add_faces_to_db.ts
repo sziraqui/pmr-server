@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
 import { ArgumentParser } from 'argparse';
-import { readdir, readdirSync } from 'fs';
+import { readdir } from 'fs';
 import path from 'path';
-import { readImage, showImage, waitKey } from 'nodoface';
+import { readImage } from 'nodoface';
 import { Facenet, FaceDetector, FaceModelParameters } from '../../pmr-core/src/index';
 import { db } from '../';
 import { DbHelper } from '../src/dbclient';
@@ -17,30 +17,30 @@ async function run(dataPath: string) {
     mtcnn = await FaceDetector.getInstance({ detector: 'mtcnn', weightsPath: faceModelParams.getMtcnnLocation() });
     facenet = await Facenet.getInstance();
     dbh = new db.DbHelper();
-    let dirs = readdirSync(dataPath);
-    for (let subdir of dirs) {
-        console.log(subdir);
-        await handleFaceDir(path.join(dataPath, subdir));
-    }
+    readdir(dataPath, async (err, dirs) => {
+        if (err) throw err;
+        dirs.forEach(async (subdir, i) => {
+            // handle face dir
+            console.log(`Processing ${i} of ${dirs.length}`);
+            await handleFaceDir(path.join(dataPath, subdir));
+        });
+    });
 }
 
 async function handleFaceDir(dir: string) {
-    let files = readdirSync(dir);
-    for (let file of files) {
-        // add face to db
-        let img = readImage(path.join(dir, file));
-        let faceBlobs = await mtcnn.detect(img);
-        console.log('Detected faces', faceBlobs.length);
-        for (let faceBlob of faceBlobs) {
-            faceBlob.descriptor = await facenet.embedding(faceBlob.faceImage);
-            let personName = path.basename(dir).replace('_', ' ');
-            console.log(file)
-            showImage(img.extract(faceBlob.bbox), file);
-            waitKey(0);
-            let res = await dbh.insertFace(Array.from(faceBlob.descriptor), personName);
-            console.log('inserted', personName);
-        }
-    }
+    readdir(dir, async (err, files) => {
+        if (err) console.log(`Err:${err.message}`);
+        files.forEach(async (file) => {
+            // add face to db
+            let img = readImage(path.join(dir, file));
+            let faceBlobs = await mtcnn.detect(img);
+            faceBlobs.forEach(async (faceBlob) => {
+                faceBlob.descriptor = await facenet.embedding(faceBlob.faceImage);
+                let personName = path.basename(dir).replace('_', ' ');
+                await dbh.insertFace(Array.from(faceBlob.descriptor), personName);
+            });
+        });
+    });
 }
 
 console.log(args);
