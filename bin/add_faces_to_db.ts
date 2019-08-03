@@ -28,7 +28,7 @@ async function run(dataPath: string) {
         if (err) throw err;
         dirs.forEach(async (subdir, i) => {
             // handle face dir
-            console.log(`Processing ${i} of ${dirs.length}`);
+            console.log(`Processing ${i + 1}/${dirs.length}: ${subdir}`);
             try {
                 await handleFaceDir(path.join(dataPath, subdir));
             } catch (error) {
@@ -46,17 +46,13 @@ async function handleFaceDir(dir: string) {
             try {
                 let img = readImage(path.join(dir, file));
                 let faceBlobs = await mtcnn.detect(img);
-                faceBlobs.forEach(async (faceBlob) => {
-                    try {
-                        faceBlob.descriptor = await facenet.embedding(faceBlob.faceImage);
-                        let personName = path.basename(dir).replace('_', ' ');
-                        let res = await dbh.insertFace(Array.from(faceBlob.descriptor), personName);
-                        res['update_dataset_status'] = await dbh.updateDatasetInfo(args.dataset.toUpperCase(), args.variant.toUpperCase(), path.join(path.basename(dir), file), res['face_id']);
-                        return res;
-                    } catch (err1) {
-                        return Promise.reject(err.message);
-                    }
-                });
+                for (let i = 0; i < Math.min(1, faceBlobs.length); i++) {
+                    faceBlobs[0].descriptor = await facenet.embedding(faceBlobs[0].faceImage);
+                    let personName = path.basename(dir).replace('_', ' ');
+                    let res = await dbh.insertFace(Array.from(faceBlobs[0].descriptor), personName);
+                    res['update_dataset_status'] = await dbh.updateDatasetInfo(args.dataset.toUpperCase(), args.variant.toUpperCase(), path.join(path.basename(dir), file), res['face_id']);
+                    console.log(`Done: ${file}`);
+                }
             } catch (error) {
                 return Promise.reject(error);
             }
