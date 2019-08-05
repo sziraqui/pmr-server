@@ -50,4 +50,12 @@ export class DbHelper {
             return Promise.reject(err.message);
         }
     }
+
+    async getFaceAndLabels() {
+        try {
+            return await this.db.executeQuery(qri.SELECT_FACE_PERSON_NAME_FOR_CLASSIFIER, []);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
