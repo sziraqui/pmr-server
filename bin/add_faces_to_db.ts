@@ -11,6 +11,8 @@ let parser = new ArgumentParser();
 parser.addArgument('dataPath', { help: 'dataset directory' });
 parser.addArgument('dataset', { help: 'name of dataset eg. lfw' });
 parser.addArgument('variant', { help: 'dataset variant eg. "deepfunneled" for lfw-deepfunneled', defaultValue: 'main', required: false });
+parser.addArgument(['--minExamples', '-m'], { help: 'minimum examples per class', type: parseInt, required: false, defaultValue: 1 });
+parser.addArgument(['--numExamples', '-n'], { help: 'number of examples per class', type: parseInt, required: false, defaultValue: 100 });
 let args = parser.parseArgs();
 
 let faceModelParams = new FaceModelParameters([__dirname]);
@@ -41,22 +43,24 @@ async function run(dataPath: string) {
 async function handleFaceDir(dir: string) {
     readdir(dir, async (err, files) => {
         if (err) console.log(`Err:${err.message}`);
-        files.forEach(async (file) => {
-            // add face to db
-            try {
-                let img = readImage(path.join(dir, file));
-                let faceBlobs = await mtcnn.detect(img);
-                for (let i = 0; i < Math.min(1, faceBlobs.length); i++) {
-                    faceBlobs[0].descriptor = await facenet.embedding(faceBlobs[0].faceImage);
-                    let personName = path.basename(dir).replace('_', ' ');
-                    let res = await dbh.insertFace(Array.from(faceBlobs[0].descriptor), personName);
-                    res['update_dataset_status'] = await dbh.updateDatasetInfo(args.dataset.toUpperCase(), args.variant.toUpperCase(), path.join(path.basename(dir), file), res['face_id']);
-                    console.log(`Done: ${file}`);
+        if (files.length >= args.minExamples) {
+            files.slice(0, args.numExamples).forEach(async (file) => {
+                // add face to db
+                try {
+                    let img = readImage(path.join(dir, file));
+                    let faceBlobs = await mtcnn.detect(img);
+                    for (let i = 0; i < Math.min(1, faceBlobs.length); i++) {
+                        faceBlobs[0].descriptor = await facenet.embedding(faceBlobs[0].faceImage);
+                        let personName = path.basename(dir).replace('_', ' ');
+                        let res = await dbh.insertFace(Array.from(faceBlobs[0].descriptor), personName);
+                        res['update_dataset_status'] = await dbh.updateDatasetInfo(args.dataset.toUpperCase(), args.variant.toUpperCase(), path.join(path.basename(dir), file), res['face_id']);
+                        console.log(`Done: ${file}`);
+                    }
+                } catch (error) {
+                    return Promise.reject(error);
                 }
-            } catch (error) {
-                return Promise.reject(error);
-            }
-        });
+            });
+        }
     });
 }
 

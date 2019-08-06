@@ -51,9 +51,9 @@ export class DbHelper {
         }
     }
 
-    async getFaceAndLabels() {
+    async getFaceAndLabels(dataset: string = 'LFW', variant: string = 'DEEPFUNELLED') {
         try {
-            return await this.db.executeQuery(qri.SELECT_FACE_PERSON_NAME_FOR_CLASSIFIER, []);
+            return await this.db.executeQuery(qri.SELECT_FACE_PERSON_NAME_FOR_CLASSIFIER, [dataset, variant]);
         } catch (error) {
             return Promise.reject(error);
         }
