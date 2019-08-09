@@ -4,5 +4,6 @@
 # transpiled files
 lib
 # config files
-config/*.json
-
+config/secrets.json
+config/dbconfig.json
+!config/default.json

@@ -1,5 +1,6 @@
 import * as secrets from '../../config/secrets.json';
 import * as settings from '../../config/dbconfig.json';
+import * as config from '../../config/default.json';
 
 import { Pool } from 'pg';
 
@@ -8,7 +9,7 @@ export class DbConnection {
     private constructor(private pool: Pool) { }
 
     public static getInstance() {
-        const ENV = secrets.environment || 'dev';
+        const ENV = config.environment || 'dev';
         if (!DbConnection.instance) {
             console.log('Creating database pool');
             let pool = new Pool({
