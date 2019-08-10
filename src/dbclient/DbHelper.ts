@@ -58,4 +58,29 @@ export class DbHelper {
             return Promise.reject(error);
         }
     }
+
+    async createNewJob() {
+        try {
+            const id = uuidv4();
+            return await this.db.executeQuery(qri.REGISTER_JOB, [id]);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async getJobStatus(id: string) {
+        try {
+            return await this.db.executeQuery(qri.GET_JOB_STATUS, [id]);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async updateJobStatus(id: string, status: string, resultUrl: string) {
+        try {
+            return await this.db.executeQuery(qri.UPDATE_JOB_STATUS, [id, status, resultUrl]);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
