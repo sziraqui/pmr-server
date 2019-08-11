@@ -1,9 +1,12 @@
 {
     "environment": "dev",
-    "port": "3000",
-    "rest": {
-        "max_json_size": "50mb",
-        "max_urlencoded_size": "50mb",
-        "max_params": 5000
+    "dev": {
+        "host": "http://localhost",
+        "port": "3000",
+        "rest": {
+            "max_json_size": "50mb",
+            "max_urlencoded_size": "50mb",
+            "max_params": 5000
+        }
     }
 }

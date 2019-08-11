@@ -4,7 +4,8 @@ import * as bodyParser from "body-parser";
 import * as path from "path";
 import showError from "http-errors";
 import cors from "cors";
-import config from '../config/default.json';
+import { environment as ENV } from '../config/default.json'
+const config = require('../config/default.json')[ENV];
 
 export const app: express.Application = express();
 
