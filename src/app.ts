@@ -20,8 +20,9 @@ app.use(cors());
 app.options('*', cors());
 /** static files */
 app.use(express.static(path.join(__dirname, '..', 'public')));
-
+/** All endpoints */
 app.use('/api/v0', require('./api/v0/face-ops').router);
+app.use('/api/v0', require('./api/v0/jobs').router);
 
 /** Error handler */
 // catch 404 and forward to error handler

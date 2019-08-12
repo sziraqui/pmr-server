@@ -26,6 +26,8 @@ export class DetectFaces {
 
     async run() {
         let jobStatus = await this.dbHelper.createNewJob();
+        let resultUrl = `${config.host}:${config.port}/api/v0/jobs/${jobStatus['JobId']}`;
+        jobStatus['ResultUrl'] = resultUrl;
         const image = nf.Image.fromBase64(this.imageBlob);
         const detector = await FaceDetector.getInstance();
         let faceBlobs = await detector.detect(image);
