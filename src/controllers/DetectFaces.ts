@@ -6,8 +6,8 @@ import { DetectFacesResponse } from "../amzn-dtypes";
 import { constants } from '../../';
 import * as path from 'path';
 import { DbHelper } from "../dbclient";
-const ENV = require(constants.configDir).environment;
-const config = require('../config/default.json')[ENV]
+const ENV = require(constants.configFile).environment;
+const config = require(constants.configFile)[ENV];
 import * as _ from 'lodash';
 
 /**
@@ -25,13 +25,13 @@ export class DetectFaces {
     }
 
     async run() {
-        const jobStatus = await this.dbHelper.createNewJob();
+        let jobStatus = await this.dbHelper.createNewJob();
         const image = nf.Image.fromBase64(this.imageBlob);
         const detector = await FaceDetector.getInstance();
         let faceBlobs = await detector.detect(image);
-        this.drawJob(faceBlobs, image, jobStatus['JobId']).catch(console.log);
+        this.drawJob(faceBlobs, image, jobStatus['JobId']).then(resultUrl => this.dbHelper.updateJobStatus(jobStatus['JobId'], 'COMPLETED', resultUrl)).then(console.log);
         let facedetails = [];
-        faceBlobs.forEach((faceBlob) => {
+        await faceBlobs.forEach((faceBlob) => {
             facedetails.push(new amzn.FaceDetail(amzn.BoundingBox.fromRect(faceBlob.bbox, image.width(), image.height()), null, null, null, null, null, null, null, null, null, null, null, null, null, faceBlob.confidence * 100));
         });
         let result = new DetectFacesResponse(facedetails);
@@ -40,14 +40,18 @@ export class DetectFaces {
     }
 
     async drawJob(faceBlobs: FaceBlob[], image: nf.Image, jobId: string) {
+        let detections = [];
+        let texts = [];
+        let colors = [];
         faceBlobs.forEach((faceBlob, i) => {
-            const color = randomColor() as [number, number, number];
-            nf.drawRect(image, faceBlob.bbox, color);
-            nf.drawText(image, `Face ${i}, ${(faceBlob.confidence * 100).toFixed(2)}`, { x: faceBlob.bbox.x - 2, y: faceBlob.bbox.y - 2 }, color);
+            detections.push(faceBlob.bbox);
+            texts.push(`Face ${i}, ${(faceBlob.confidence * 100).toFixed(2)}`);
+            colors.push(randomColor());
         });
+        nf.drawDetections(image, detections, texts, colors, 0.8);
         let resultPath = path.join(constants.jobOutputDir, jobId + '.jpg');
         nf.saveImage(resultPath, image);
-        let resultUrl = `${config.host}:${config.port}/${resultPath}`;
-        return await this.dbHelper.updateJobStatus(jobId, 'COMPLETED', resultUrl);
+        let resultUrl = `${config.host}:${config.port}/downloads/jobs/${jobId}.jpg`;
+        return await resultUrl;
     }
 }

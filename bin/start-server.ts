@@ -8,7 +8,10 @@ import { app } from '../src/app';
 import * as http from 'http';
 const debug = require('debug')('pmr-server');
 
-const config = require('../config/default.json');
+const ENV = require('../config/default.json').environment;
+const config = require('../config/default.json')[ENV];
+
+require('../src/boot').boot();
 
 /**
  * Get port from environment and store in Express.

@@ -7,3 +7,5 @@ lib
 config/secrets.json
 config/dbconfig.json
 !config/default.json
+public
+!public/downloads/jobs/.gitkeep

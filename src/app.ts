@@ -21,6 +21,8 @@ app.options('*', cors());
 /** static files */
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+app.use('/api/v0', require('./api/v0/face-ops').router);
+
 /** Error handler */
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -33,6 +35,7 @@ app.use(function (err, req: Request, res: Response, next) {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     // render the error page
     res.status(err.status || 500);
+    console.log(err);
     res.send('Something went wrong');
 
 });

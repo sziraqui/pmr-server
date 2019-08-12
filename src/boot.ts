@@ -3,7 +3,7 @@ import { DbConnection } from './dbclient';
 
 export async function boot() {
     let params = new FaceModelParameters([__dirname]);
-    FaceDetector.getInstance({ detector: 'mtcnn', weightsPath: params.getMtcnnLocation(), minConfidence: 50 })
+    FaceDetector.getInstance({ detector: 'mtcnn', weightsPath: params.getMtcnnLocation(), minConfidence: 0.5, drawBBox: false })
         .then(() => console.log('FaceDetector initialised'));
     Facenet.getInstance()
         .then(() => console.log('Facenet initialised'));
