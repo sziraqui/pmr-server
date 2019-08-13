@@ -59,7 +59,7 @@ export class DbHelper {
         }
     }
 
-    async createNewJob() {
+    async createNewJob(): Promise<JobStatus> {
         try {
             const id = uuidv4();
             return (await this.db.executeQuery(qri.REGISTER_JOB, [id]))[0]['register_job'];
@@ -68,7 +68,7 @@ export class DbHelper {
         }
     }
 
-    async getJobStatus(id: string) {
+    async getJobStatus(id: string): Promise<JobStatus> {
         try {
             return (await this.db.executeQuery(qri.GET_JOB_STATUS, [id]))[0]['get_job_status'];
         } catch (error) {
@@ -76,11 +76,15 @@ export class DbHelper {
         }
     }
 
-    async updateJobStatus(id: string, status: string, resultUrl: string) {
+    async updateJobStatus(id: string, status: string, resultUrl: string): Promise<JobStatus> {
         try {
             return (await this.db.executeQuery(qri.UPDATE_JOB_STATUS, [id, status, resultUrl]))[0]['update_job_status'];
         } catch (error) {
             return Promise.reject(error);
         }
     }
+}
+
+export class JobStatus {
+    constructor(public JobId: string, public Status: string, public ResultUrl: string) { }
 }

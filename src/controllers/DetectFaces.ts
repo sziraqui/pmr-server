@@ -19,19 +19,19 @@ export class DetectFaces {
     dbHelper: DbHelper;
 
     constructor(private req: Request, private res: Response) {
-        this.imageBlob = req.body.Bytes;
+        this.imageBlob = req.body.Image.Bytes;
         this.attrs = req.body.Attributes;
         this.dbHelper = new DbHelper();
     }
 
     async run() {
         let jobStatus = await this.dbHelper.createNewJob();
-        let resultUrl = `${config.host}:${config.port}/api/v0/jobs/${jobStatus['JobId']}`;
-        jobStatus['ResultUrl'] = resultUrl;
+        let resultUrl = `${config.host}:${config.port}/api/v0/jobs/${jobStatus.JobId}`;
+        jobStatus.ResultUrl = resultUrl;
         const image = nf.Image.fromBase64(this.imageBlob);
         const detector = await FaceDetector.getInstance();
         let faceBlobs = await detector.detect(image);
-        this.drawJob(faceBlobs, image, jobStatus['JobId']).then(resultUrl => this.dbHelper.updateJobStatus(jobStatus['JobId'], 'COMPLETED', resultUrl)).then(console.log);
+        this.drawJob(faceBlobs, image, jobStatus.JobId).then(resultUrl => this.dbHelper.updateJobStatus(jobStatus.JobId, 'COMPLETED', resultUrl)).then(console.log);
         let facedetails = [];
         await faceBlobs.forEach((faceBlob) => {
             facedetails.push(new amzn.FaceDetail(amzn.BoundingBox.fromRect(faceBlob.bbox, image.width(), image.height()), null, null, null, null, null, null, null, null, null, null, null, null, null, faceBlob.confidence * 100));
