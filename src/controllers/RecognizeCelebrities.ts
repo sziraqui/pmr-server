@@ -16,7 +16,7 @@ import { RecognizeCelebritiesResponse } from "../amzn-dtypes/response-types/Reco
  * @see 
  */
 export class RecognizeCelebrities {
-    minRecogConfidence = 0.5;
+    minRecogConfidence = 0.4;
     imageBlob: string;
     dbHelper: DbHelper;
     faceBlobs: FaceBlob[];
@@ -43,6 +43,7 @@ export class RecognizeCelebrities {
 
     async dispatch() {
         this.job = await this.dbHelper.createNewJob();
+        console.log('dispatch:', JSON.stringify(this.job));
         let resultUrl = `${config.host}:${config.port}/api/v0/jobs/${this.job.JobId}`;
         this.job.ResultUrl = resultUrl;
         return this.job;
@@ -63,7 +64,7 @@ export class RecognizeCelebrities {
             this.faceBlobs[i].descriptor = await facenet.embedding(this.faceBlobs[i].faceImage);
             let result = await classifier.predict(Float64Array.from(this.faceBlobs[i].descriptor));
             this.faceBlobs[i].name = result.label;
-            this.classifierResults.push(result);
+            this.classifierResults[i] = result;
         }
         return this.faceBlobs;
     }
@@ -72,35 +73,37 @@ export class RecognizeCelebrities {
         let detections = [];
         let texts = [];
         let colors = [];
-        this.faceBlobs.forEach((faceBlob, i) => {
+        for (let i = 0; i < this.faceBlobs.length; i++) {
+            let faceBlob = this.faceBlobs[i];
             let label = '';
             let recogConf = this.classifierResults[i].confidences[faceBlob.name];
             if (recogConf > this.minRecogConfidence) {
                 label = `${i}|${faceBlob.name}, ${(recogConf * 100).toFixed(2)}`;
             } else {
                 label = `${i}|Unknown`;
+                label += `|Face, ${(faceBlob.confidence * 100).toFixed(2)}`;
             }
-            label += `\nFace, ${(faceBlob.confidence).toFixed(2)}`;
             detections.push(faceBlob.bbox);
             texts.push(label);
             colors.push(randomColor());
-        });
+        }
         nf.drawDetections(this.image, detections, texts, colors, 0.8);
         let resultPath = path.join(constants.jobOutputDir, this.job.JobId + '.jpg');
         nf.saveImage(resultPath, this.image);
         this.job.ResultUrl = `${config.host}:${config.port}/downloads/jobs/${this.job.JobId}.jpg`;
         this.job.Status = 'COMPLETED';
-        this.dbHelper.updateJobStatus(this.job.JobId, this.job.Status, this.job.ResultUrl);
+        await this.dbHelper.updateJobStatus(this.job.JobId, this.job.Status, this.job.ResultUrl);
         return await this.job.ResultUrl;
     }
 
     makeResult() {
         let celebrities = new Array<amzn.Celebrity>();
         let unrecognised = new Array<amzn.ComparedFace>();
-        this.faceBlobs.forEach((faceBlob, i) => {
+        for (let i = 0; i < this.faceBlobs.length; i++) {
+            let faceBlob = this.faceBlobs[i];
             let comparedFace = new amzn.ComparedFace(
                 BoundingBox.fromRect(faceBlob.bbox, this.image.width(), this.image.height()),
-                faceBlob.confidence
+                faceBlob.confidence * 100
             );
             if (this.classifierResults[i].confidences[faceBlob.name] > this.minRecogConfidence) {
                 celebrities.push(
@@ -108,13 +111,13 @@ export class RecognizeCelebrities {
                         faceBlob.name,
                         comparedFace,
                         this.classifierResults[i].classIndex,
-                        this.classifierResults[i].confidence[faceBlob.name]
+                        this.classifierResults[i].confidences[faceBlob.name] * 100
                     )
                 );
             } else {
                 unrecognised.push(comparedFace);
             }
-        });
+        }
         this.result = new RecognizeCelebritiesResponse(celebrities, unrecognised, null);
         this.dbHelper.updateJobResult(this.job.JobId, 'DRAWING', this.result);
         return this.result;

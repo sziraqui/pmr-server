@@ -7,4 +7,4 @@ export const SELECT_FACES_BY_NAME = 'SELECT personId,embedding,personName FROM f
     UPDATE_JOB_STATUS = 'SELECT public.update_job_status($1, $2, $3) AS RESULT',
     GET_JOB_STATUS = 'SELECT public.get_job_status($1) AS RESULT',
     GET_JOB_RESULT = 'SELECT public.get_job_result($1) AS RESULT',
-    UPDATE_JOB_RESULT = 'SELECT publi.update_job_result($1, $2, $3) AS RESULT';
+    UPDATE_JOB_RESULT = 'SELECT public.update_job_result($1, $2, $3) AS RESULT';
