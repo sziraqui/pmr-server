@@ -84,7 +84,7 @@ export class DbHelper {
         }
     }
 
-    async get_job_result(id: string) {
+    async getJobResult(id: string) {
         try {
             return await this.db.executeQuery(qri.GET_JOB_RESULT, [id]);
         } catch (error) {
@@ -92,7 +92,7 @@ export class DbHelper {
         }
     }
 
-    async update_job_result(id: string, status: string, jsonResult: Object) {
+    async updateJobResult(id: string, status: string, jsonResult: Object) {
         try {
             return await this.db.executeQuery(qri.UPDATE_JOB_RESULT, [id, status, jsonResult]);
         } catch (error) {
