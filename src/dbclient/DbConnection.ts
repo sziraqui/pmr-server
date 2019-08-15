@@ -39,7 +39,7 @@ export class DbConnection {
             try {
                 const data = await dbClient.query(query, params);
                 dbClient.release();
-                return data.rows;
+                return data.rows[0];
             }
             catch (err) {
                 dbClient.release();

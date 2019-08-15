@@ -62,15 +62,15 @@ export class DbHelper {
     async createNewJob(): Promise<Job> {
         try {
             const id = uuidv4();
-            return (await this.db.executeQuery(qri.REGISTER_JOB, [id]))[0]['register_job'];
+            return await this.db.executeQuery(qri.REGISTER_JOB, [id]) as Promise<Job>;
         } catch (error) {
             return Promise.reject(error);
         }
     }
 
-    async getJobStatus(id: string): Promise<Job> {
+    async getJobStatus(id: string) {
         try {
-            return (await this.db.executeQuery(qri.GET_JOB_STATUS, [id]))[0]['get_job_status'];
+            return await this.db.executeQuery(qri.GET_JOB_STATUS, [id]) as Promise<Job>;
         } catch (error) {
             return Promise.reject(error);
         }
@@ -78,7 +78,23 @@ export class DbHelper {
 
     async updateJobStatus(id: string, status: string, resultUrl: string): Promise<Job> {
         try {
-            return (await this.db.executeQuery(qri.UPDATE_JOB_STATUS, [id, status, resultUrl]))[0]['update_job_status'];
+            return await this.db.executeQuery(qri.UPDATE_JOB_STATUS, [id, status, resultUrl]) as Promise<Job>;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async get_job_result(id: string) {
+        try {
+            return await this.db.executeQuery(qri.GET_JOB_RESULT, [id]);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async update_job_result(id: string, status: string, jsonResult: Object) {
+        try {
+            return await this.db.executeQuery(qri.UPDATE_JOB_RESULT, [id, status, jsonResult]);
         } catch (error) {
             return Promise.reject(error);
         }
