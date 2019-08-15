@@ -6,7 +6,7 @@ import { DbHelper } from '../../dbclient';
 export const router = Router();
 
 router.get('/jobs/:jobId', (req: Request, res: Response) => {
-    new DbHelper().getJobStatus(req.params.jobId)
+    new DbHelper().getJobResult(req.params.jobId)
         .then(result => sendUncached(res, httpStatus.OK, result))
         .catch(error => sendError(req, res, error));
 });

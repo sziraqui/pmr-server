@@ -32,9 +32,10 @@ export class RecognizeCelebrities {
     async run() {
         try {
             await this.dispatch();
-            await this.process();
-            await this.makeResult();
-            await this.drawJob();
+            this.process().then(async (r) => {
+                await this.makeResult();
+                await this.drawJob();
+            });
             return _.merge({}, this.result, this.job);
         } catch (error) {
             return Promise.reject(error);
@@ -43,7 +44,6 @@ export class RecognizeCelebrities {
 
     async dispatch() {
         this.job = await this.dbHelper.createNewJob();
-        console.log('dispatch:', JSON.stringify(this.job));
         let resultUrl = `${config.host}:${config.port}/api/v0/jobs/${this.job.JobId}`;
         this.job.ResultUrl = resultUrl;
         return this.job;
