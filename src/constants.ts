@@ -1,6 +1,8 @@
 import * as path from 'path';
-export const staticDir = path.resolve(path.join(__dirname, '..', 'public')),
+export const rootDir = path.resolve(path.join(__dirname, '..')),
+    staticDir = path.resolve(path.join(rootDir, 'public')),
     downloadsDir = path.join(staticDir, 'downloads'),
     jobOutputDir = path.join(downloadsDir, 'jobs'),
-    configDir = path.resolve(path.join(__dirname, '..', 'config')),
-    configFile = path.join(configDir, 'default.json');
+    configDir = path.resolve(path.join(rootDir, 'config')),
+    configFile = path.join(configDir, 'default.json'),
+    videoDir = path.join(rootDir, 'data', 'videos')
