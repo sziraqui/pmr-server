@@ -18,10 +18,12 @@ import * as pmr from "../pmr-dtypes";
 export class CelebrityInVideo {
     videoUrl: string;
     videoFile: string;
+    savedFile: string;
     dbHelper: DbHelper;
     job: Job;
     minRecogConfidence: 0.4;
     annotedFrames: Array<pmr.AnnotatedFrame>;
+    videoWriter: nf.VideoWriter;
     result: pmr.CelebrityInVideoResponse;
 
     constructor(private req: Request, private res: Response) {
@@ -51,7 +53,7 @@ export class CelebrityInVideo {
     }
 
     async prepare() {
-        this.videoFile = uuidv4();
+        this.videoFile = uuidv4() + "." + this.videoUrl.split('.').slice(-1)[0];
         await this.dbHelper.updateJobStatus(this.job.JobId, 'DOWNLOADING', this.job.ResultUrl);
         try {
             await download(this.videoUrl)
@@ -69,6 +71,8 @@ export class CelebrityInVideo {
             Facenet.getInstance(),
             FaceClassifier.getInstance()]);
         let videoStream = new nf.SequenceCapture();
+        this.savedFile = path.join(constants.jobOutputDir, this.job.JobId + '.mp4');
+        this.videoWriter = new nf.VideoWriter(this.savedFile, videoStream.width, videoStream.height, videoStream.fps, "mp4v");
         videoStream.openVideoFile(this.videoFile);
         this.annotedFrames = new Array<pmr.AnnotatedFrame>();
         for (let i = 0; videoStream.getProgress() < 1; i++) {
@@ -138,13 +142,17 @@ export class CelebrityInVideo {
             colors.push(randomColor());
         }
         nf.drawDetections(image, detections, texts, colors, 0.8);
-        let resultPath = path.join(constants.videoDir, this.job.JobId + '_' + this.annotedFrames.length + '.jpg');
-        nf.saveImage(resultPath, image);
+        this.videoWriter.write(image);
+        return image;
     }
 
     async makeResult() {
         this.result = new pmr.CelebrityInVideoResponse(this.annotedFrames, []);
-        this.job = await this.dbHelper.updateJobResult(this.job.JobId, 'COMPLETED', this.result);
+        this.videoWriter.release();
+        let resultUrl = `${config.host}:${config.port}/downloads/jobs/${this.job.JobId}.mp4`;
+        this.job = await this.dbHelper.updateJobStatus(this.job.JobId, 'COMPLETED', resultUrl);
+        this.result = await this.dbHelper.updateJobResult(this.job.JobId, 'COMPLETED', this.result);
+        return this.result;
     }
 
 }

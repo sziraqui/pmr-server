@@ -56,7 +56,7 @@
     "http-status": "^1.3.2",
     "lodash": "^4.17.15",
     "morgan": "^1.9.1",
-    "nodoface": "0.0.9",
+    "nodoface": "0.0.10",
     "pg": "^7.12.1",
     "pmr-core": "0.0.1",
     "uuidv4": "^4.0.0"
